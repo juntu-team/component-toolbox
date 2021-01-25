@@ -5,20 +5,35 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { RangeChangeEventDetail } from "./components/my-component/my-component-interface";
 export namespace Components {
     interface MyComponent {
         /**
-          * The first name
+          * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
          */
+        "color"?: string;
+        /**
+          * How long, in milliseconds, to wait to trigger the `ionChange` event after each change in the range value. This also impacts form bindings such as `ngModel` or `v-model`.
+         */
+        "debounce": number;
+        /**
+          * Maximum integer value of the range.
+         */
+        "max": number;
+        /**
+          * Minimum integer value of the range.
+         */
+        "min": number;
+        /**
+          * Value
+         */
+        "value": number;
+    }
+    interface MySecondComponent {
         "first": string;
-        /**
-          * The last name
-         */
         "last": string;
-        /**
-          * The middle name
-         */
         "middle": string;
+        "value": number;
     }
 }
 declare global {
@@ -28,27 +43,53 @@ declare global {
         prototype: HTMLMyComponentElement;
         new (): HTMLMyComponentElement;
     };
+    interface HTMLMySecondComponentElement extends Components.MySecondComponent, HTMLStencilElement {
+    }
+    var HTMLMySecondComponentElement: {
+        prototype: HTMLMySecondComponentElement;
+        new (): HTMLMySecondComponentElement;
+    };
     interface HTMLElementTagNameMap {
         "my-component": HTMLMyComponentElement;
+        "my-second-component": HTMLMySecondComponentElement;
     }
 }
 declare namespace LocalJSX {
     interface MyComponent {
         /**
-          * The first name
+          * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
          */
+        "color"?: string;
+        /**
+          * How long, in milliseconds, to wait to trigger the `ionChange` event after each change in the range value. This also impacts form bindings such as `ngModel` or `v-model`.
+         */
+        "debounce"?: number;
+        /**
+          * Maximum integer value of the range.
+         */
+        "max"?: number;
+        /**
+          * Minimum integer value of the range.
+         */
+        "min"?: number;
+        /**
+          * Emitted when the value property has changed.
+         */
+        "onJunChange"?: (event: CustomEvent<RangeChangeEventDetail>) => void;
+        /**
+          * Value
+         */
+        "value"?: number;
+    }
+    interface MySecondComponent {
         "first"?: string;
-        /**
-          * The last name
-         */
         "last"?: string;
-        /**
-          * The middle name
-         */
         "middle"?: string;
+        "value"?: number;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
+        "my-second-component": MySecondComponent;
     }
 }
 export { LocalJSX as JSX };
@@ -56,6 +97,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-second-component": LocalJSX.MySecondComponent & JSXBase.HTMLAttributes<HTMLMySecondComponentElement>;
         }
     }
 }
