@@ -104,7 +104,6 @@ export class MyComponent {
     this.valueChanged( val );
     this.currentY =this.valueToPixels( val );
     this.yOffset = this.currentY;
-    console.log(`Min: ${this.min} Max: ${this.max}`);
   }
 
 
