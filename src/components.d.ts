@@ -16,6 +16,7 @@ export namespace Components {
           * How long, in milliseconds, to wait to trigger the `ionChange` event after each change in the range value. This also impacts form bindings such as `ngModel` or `v-model`.
          */
         "debounce": number;
+        "icon": string;
         /**
           * Maximum integer value of the range.
          */
@@ -64,6 +65,7 @@ declare namespace LocalJSX {
           * How long, in milliseconds, to wait to trigger the `ionChange` event after each change in the range value. This also impacts form bindings such as `ngModel` or `v-model`.
          */
         "debounce"?: number;
+        "icon"?: string;
         /**
           * Maximum integer value of the range.
          */

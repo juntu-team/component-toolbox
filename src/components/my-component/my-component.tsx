@@ -1,6 +1,7 @@
 import { Component, /* Listen, */ /* ComponentInterface, */ Element, Event, EventEmitter, Host, Prop, /* State, */ Watch, h } from '@stencil/core';
 import { RangeChangeEventDetail/* , RangeValue */ } from './my-component-interface';
 import { clamp, convertRange } from '../../utils/utils';
+import 'ionicons';
 
 @Component({
   tag: 'my-component',
@@ -29,6 +30,7 @@ export class MyComponent {
    * For more information on colors, see [theming](/docs/theming/basics).
    */
   @Prop() color?: string;
+  @Prop() icon = "heart";
 
   /**
    * How long, in milliseconds, to wait to trigger the
@@ -227,15 +229,17 @@ export class MyComponent {
   render() {
     return (
       <Host>
-        <div id="back"
+        <div class="background"
           // ref={base => this.base = base as HTMLElement}
         >
-          <div id="slide"
+          <div class="slide"
             ref={slide => this.dragItem = slide as HTMLElement}
             // style={{backgroundColor:"var(--slide-bar-color)"}}
           >
           </div>
         </div>
+        {/* <img class="icon" src={`${this.icon}`} /> */}
+        <ion-icon class="icon" name={`${this.icon}`}></ion-icon>
       </Host>
     );
   }

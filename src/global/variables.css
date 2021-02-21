@@ -1,5 +1,6 @@
 :root {
     --juntu-primary-color: #488aff;
     --bar-background: gray;
-    --bar-slide: var(--juntu-primary-color); 
+    --bar-slide: var(--juntu-primary-color);
+    --icon-color: white;
 }
