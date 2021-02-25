@@ -1,4 +1,4 @@
-# my-component
+# vertical-slider
 
 
 
@@ -33,8 +33,8 @@
 ### Graph
 ```mermaid
 graph TD;
-  my-component --> ion-icon
-  style my-component fill:#f9f,stroke:#333,stroke-width:4px
+  vertical-slider --> ion-icon
+  style vertical-slider fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

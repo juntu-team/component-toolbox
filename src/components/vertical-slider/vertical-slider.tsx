@@ -1,14 +1,14 @@
 import { Component, /* Listen, */ /* ComponentInterface, */ Element, Event, EventEmitter, Host, Prop, /* State, */ Watch, h } from '@stencil/core';
-import { RangeChangeEventDetail/* , RangeValue */ } from './my-component-interface';
+import { RangeChangeEventDetail/* , RangeValue */ } from './vertical-slider-interface';
 import { clamp, convertRange } from '../../utils/utils';
 import 'ionicons';
 
 @Component({
-  tag: 'my-component',
-  styleUrl: 'my-component.css',
+  tag: 'vertical-slider',
+  styleUrl: 'vertical-slider.css',
   shadow: true,
 })
-export class MyComponent {
+export class VerticalSlider {
   @Element() private el: HTMLElement;
   private dragItem;
   // private base: HTMLElement;
@@ -207,8 +207,8 @@ export class MyComponent {
       if ( this.currentY < 0 ) {
         this.currentY = 0;
         this.initialY = touchY;
-      } else if ( this.currentY > this.el.scrollHeight ) {
-        this.currentY = this.el.scrollHeight;
+      } else if ( this.currentY > this.el.offsetHeight ) {
+        this.currentY = this.el.offsetHeight;
         this.initialY = touchY - this.yOffset;
       }
 
