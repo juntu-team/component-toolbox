@@ -9,9 +9,10 @@ import 'ionicons';
   shadow: true,
 })
 export class VerticalSlider {
-  @Element() private el: HTMLElement;
+  @Element() el: HTMLElement;
+
+  // private background;
   private dragItem;
-  // private base: HTMLElement;
   private active = false;
   private currentX;
   private currentY: number;
@@ -71,17 +72,21 @@ export class VerticalSlider {
   /**
    * Value
    */
-  // @Prop({ mutable: true }) value = 50;
-  @Prop() value = 0;
+  @Prop({ mutable: true }) value = 50;
   @Watch('value')
-  protected valueChanged(value: number) {
+  valueChanged(value: number) {
+    if (value < this.min ) { 
+      value = this.value = this.min; 
+      return;
+    } else if (value > this.max ) { 
+      value = this.value = this.max; 
+      return;
+    }
 
-    // if (value < 0 || value > this.el.clientHeight) 
-    //   return;
-    const scaledVal = this.valueToPixels( value );
-    this.setTranslate(0, scaledVal, this.dragItem);
+    const ratio = this.getRatio( value );
+    this.setTranslate(0, 100*ratio, this.dragItem);
+    console.log(`Value: ${value} | ${ratio}`);
 
-    console.log("Value: ", value);
     if (!this._debounce) {
       // value = Math.trunc(value);
       this.junChange.emit({ value });
@@ -93,6 +98,9 @@ export class VerticalSlider {
   }
 
 
+  protected getRatio(value: number): number {
+    return convertRange( value, [ this.max, this.min ], [ 0, 1 ] );
+  }
 
   protected valueToPixels(value: number): number {
     return convertRange( value, [ this.max, this.min ], [ 0, this.el.clientHeight ] );
@@ -102,24 +110,34 @@ export class VerticalSlider {
     return convertRange( pixels, [ this.el.clientHeight, 0 ], [ this.min, this.max ] );
   }
 
-  protected initValue(val: number) {
-    this.valueChanged( val );
-    this.currentY =this.valueToPixels( val );
+  protected initValue(value: number) {
+    // if (value < this.min ) { 
+    //   value = this.value = this.min; 
+    //   return;
+    // } else if (value > this.max ) { 
+    //   value = this.value = this.max; 
+    //   return;
+    // }
+
+    // const scaledVal = (this.max - this.min) - (value / (this.max - this.min) * 100);
+    // this.dragItem.style.transform = "translate3d(" + 0 + "px, " + scaledVal + "%, 0)";
+    // console.log(`Init value: ${this.min} | ${this.max} | ${value} | ${scaledVal}`);
+    this.valueChanged( value );
+    this.currentY =this.valueToPixels( value );
     this.yOffset = this.currentY;
   }
 
+  // connectedCallback() {
+  //   console.log("connectedCallback");
+  // }
 
-  componentWillLoad() {
+  // async componentWillLoad() {
+  //   console.log("componentWillLoad");
+  // }
 
-  } 
-
-  componentDidLoad() {
-    // console.log("Will load: ", this.base.clientWidth);
-    // console.log("Will load: ", this.base.clientHeight);
-
-    // this.dragItem = document.querySelector("#item");
-    // this.el.addEventListener("click", (e) => this.click(e), false);
-    this.initValue(this.value);
+  async componentDidLoad() {
+    console.log(`Did load1 1`);
+    this.initValue( this.value );
 
     this.el.addEventListener("touchstart", (e) => this.dragStart(e), false);
     this.el.addEventListener("touchend", (e) => this.dragEnd(e), false);
@@ -130,11 +148,6 @@ export class VerticalSlider {
     this.el.addEventListener("mousemove", (e) => this.drag(e), false);
 
   }
-
-  // private click(e) {
-  //   console.log("Click: ", e.offsetY);
-  //   // this.setTranslate(0, e.offsetY, this.dragItem);
-  // }
 
   private dragStart(e) {
     let touchX
@@ -148,6 +161,10 @@ export class VerticalSlider {
       touchY = e.clientY;
     }
 
+    // this.currentY =this.valueToPixels( this.value );
+    // this.yOffset = this.currentY;
+    this.yOffset =this.valueToPixels( this.value );
+
     this.initialX = touchX - this.xOffset;
     this.initialY = touchY - this.yOffset;
     this.touchStartY = touchY;
@@ -158,20 +175,13 @@ export class VerticalSlider {
   }
 
   private dragEnd(e) {
-    // console.log("drag end");
-    // if (e.type === "touchend") {
-    //   this.currentY = e.touches[0].clientY - this.initialY;
-    // } else 
     if (e.type === "mouseup") {
       if ( Math.abs(e.clientY - this.touchStartY) < 2 ) {
-        // console.log(`A: ${e.clientY} B: ${e.offsetY} C: ${e.pageY} D: ${e.screenY}`);
-        // this.setTranslate(0, e.clientY - e.offsetY, this.dragItem);
         this.currentY = e.offsetY;
         this.yOffset = this.currentY;  
 
         if ( this.currentY ) {
-          // this.value = 88;
-          this.valueChanged( this.pixelsToValue(this.currentY) );
+          this.value = this.pixelsToValue(this.currentY);
         }  
       }
 
@@ -179,14 +189,10 @@ export class VerticalSlider {
       this.initialY = this.currentY;
 
     }
-
-    // const ratio = this.valueToRatio(this.currentY, this.min, this.max);
     this.active = false;
   }
 
   private drag(e) {
-    // console.log("drag");
-
     if (this.active) {
     
       e.preventDefault();
@@ -215,30 +221,28 @@ export class VerticalSlider {
       this.xOffset = this.currentX;
       this.yOffset = this.currentY;
 
-      // this.setTranslate(this.currentX, this.currentY, this.el);
-      // this.setTranslate(0, this.currentY, this.dragItem);
-      // this.value = 25
-      this.valueChanged( this.pixelsToValue(this.currentY) );
+      this.value = this.pixelsToValue(this.currentY);
     }
   }
 
   setTranslate(xPos, yPos, el) {
-    el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+    if ( el ) {
+      el.style.transform = "translate3d(" + xPos + "%, " + yPos + "%, 0)";
+    }
   }
+
 
   render() {
     return (
       <Host>
         <div class="background"
-          // ref={base => this.base = base as HTMLElement}
+          // ref={backg => this.background = backg as HTMLElement}
         >
           <div class="slide"
             ref={slide => this.dragItem = slide as HTMLElement}
-            // style={{backgroundColor:"var(--slide-bar-color)"}}
           >
           </div>
         </div>
-        {/* <img class="icon" src={`${this.icon}`} /> */}
         <ion-icon class="icon" name={`${this.icon}`}></ion-icon>
       </Host>
     );

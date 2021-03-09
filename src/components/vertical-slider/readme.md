@@ -14,7 +14,7 @@
 | `icon`     | `icon`     |                                                                                                                                                                                                                                                                        | `string` | `"heart"`   |
 | `max`      | `max`      | Maximum integer value of the range.                                                                                                                                                                                                                                    | `number` | `100`       |
 | `min`      | `min`      | Minimum integer value of the range.                                                                                                                                                                                                                                    | `number` | `0`         |
-| `value`    | `value`    | Value                                                                                                                                                                                                                                                                  | `number` | `0`         |
+| `value`    | `value`    | Value                                                                                                                                                                                                                                                                  | `number` | `50`        |
 
 
 ## Events
