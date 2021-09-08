@@ -1,28 +1,25 @@
 :host {
-  text-align: center;
+  /* text-align: center; */
   position: absolute;
   height: 100%;
-  top: 50%;
+  /* top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
 }
 
 
 :host .background {
-  /* display: block; */
   width: 120px;
   height: 100%;
   overflow: hidden;
   border-radius: 30px;
   background-color: var(--bar-background);
-  will-change: transform; /* fixes saferi bug with border-radius */
-  /* pointer-events: none; */
+  will-change: transform; /*fixes saferi bug with border-radius */
 }
 
 :host .slide {
   width: 100%;
   height: 100%;
-
   background-color: var(--bar-slide);
   /* background-color: red; */
   /* pointer-events: auto; */
@@ -31,11 +28,12 @@
 :host .icon {
   /* position: relative; */
   /* font-size: 32px; */
+  width: 64px;
+  height: 100%;
   color: var(--icon-color);
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -48px);
-  width: 64px;
-  height: 100%;
+  -webkit-transform: translate3d(-50%, -48px, 0);   /*prevent icon flicker on safari when sliding pages*/
 }
