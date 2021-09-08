@@ -31,8 +31,8 @@
     "generate": "stencil generate"
   },
   "dependencies": {
-    "@stencil/core": "2.4.0",
-    "ionicons": "^5.5.0"
+    "@stencil/core": "^2.8.0",
+    "ionicons": "^5.5.3"
   },
   "license": "MIT",
   "devDependencies": {
