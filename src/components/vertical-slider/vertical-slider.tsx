@@ -6,7 +6,7 @@ import 'ionicons';
 @Component({
   tag: 'vertical-slider',
   styleUrl: 'vertical-slider.css',
-  shadow: true,
+  shadow: true
 })
 export class VerticalSlider {
   @Element() el: HTMLElement;
@@ -136,7 +136,6 @@ export class VerticalSlider {
   // }
 
   async componentDidLoad() {
-    console.log(`Did load1 1`);
     this.initValue( this.value );
 
     this.el.addEventListener("touchstart", (e) => this.dragStart(e), false);
@@ -190,15 +189,17 @@ export class VerticalSlider {
 
     }
     this.active = false;
+
   }
 
   private drag(e) {
+
     if (this.active) {
     
       e.preventDefault();
       let touchX
       let touchY;
-      
+        
       if (e.type === "touchmove") {
         touchX = e.touches[0].clientX;
         touchY = e.touches[0].clientY;
@@ -234,17 +235,13 @@ export class VerticalSlider {
 
   render() {
     return (
-      <Host>
-        <div class="background"
-          // ref={backg => this.background = backg as HTMLElement}
-        >
-          <div class="slide"
-            ref={slide => this.dragItem = slide as HTMLElement}
-          >
+        <Host>
+        <div class="background">
+          <div class="slide" ref={slide => this.dragItem = slide as HTMLElement}>
           </div>
         </div>
         <ion-icon class="icon" name={`${this.icon}`}></ion-icon>
-      </Host>
+        </Host>
     );
   }
 
