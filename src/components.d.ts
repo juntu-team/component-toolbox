@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { RangeChangeEventDetail } from "./components/vertical-slider/vertical-slider-interface";
+import { RangeChangeEventDetail as RangeChangeEventDetail1 } from "./components/vertical-switch/vertical-switch-interface";
 export namespace Components {
     interface MySecondComponent {
         "first": string;
@@ -14,6 +15,29 @@ export namespace Components {
         "value": number;
     }
     interface VerticalSlider {
+        /**
+          * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
+         */
+        "color"?: string;
+        /**
+          * How long, in milliseconds, to wait to trigger the `ionChange` event after each change in the range value. This also impacts form bindings such as `ngModel` or `v-model`.
+         */
+        "debounce": number;
+        "icon": string;
+        /**
+          * Maximum integer value of the range.
+         */
+        "max": number;
+        /**
+          * Minimum integer value of the range.
+         */
+        "min": number;
+        /**
+          * Value
+         */
+        "value": number;
+    }
+    interface VerticalSwitch {
         /**
           * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
          */
@@ -50,9 +74,16 @@ declare global {
         prototype: HTMLVerticalSliderElement;
         new (): HTMLVerticalSliderElement;
     };
+    interface HTMLVerticalSwitchElement extends Components.VerticalSwitch, HTMLStencilElement {
+    }
+    var HTMLVerticalSwitchElement: {
+        prototype: HTMLVerticalSwitchElement;
+        new (): HTMLVerticalSwitchElement;
+    };
     interface HTMLElementTagNameMap {
         "my-second-component": HTMLMySecondComponentElement;
         "vertical-slider": HTMLVerticalSliderElement;
+        "vertical-switch": HTMLVerticalSwitchElement;
     }
 }
 declare namespace LocalJSX {
@@ -89,9 +120,37 @@ declare namespace LocalJSX {
          */
         "value"?: number;
     }
+    interface VerticalSwitch {
+        /**
+          * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
+         */
+        "color"?: string;
+        /**
+          * How long, in milliseconds, to wait to trigger the `ionChange` event after each change in the range value. This also impacts form bindings such as `ngModel` or `v-model`.
+         */
+        "debounce"?: number;
+        "icon"?: string;
+        /**
+          * Maximum integer value of the range.
+         */
+        "max"?: number;
+        /**
+          * Minimum integer value of the range.
+         */
+        "min"?: number;
+        /**
+          * Emitted when the value property has changed.
+         */
+        "onJunChange"?: (event: CustomEvent<RangeChangeEventDetail>) => void;
+        /**
+          * Value
+         */
+        "value"?: number;
+    }
     interface IntrinsicElements {
         "my-second-component": MySecondComponent;
         "vertical-slider": VerticalSlider;
+        "vertical-switch": VerticalSwitch;
     }
 }
 export { LocalJSX as JSX };
@@ -100,6 +159,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "my-second-component": LocalJSX.MySecondComponent & JSXBase.HTMLAttributes<HTMLMySecondComponentElement>;
             "vertical-slider": LocalJSX.VerticalSlider & JSXBase.HTMLAttributes<HTMLVerticalSliderElement>;
+            "vertical-switch": LocalJSX.VerticalSwitch & JSXBase.HTMLAttributes<HTMLVerticalSwitchElement>;
         }
     }
 }
