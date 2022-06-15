@@ -11,6 +11,7 @@ import 'ionicons';
 export class VerticalSlider {
   @Element() el: HTMLElement;
 
+
   // private background;
   private dragItem;
   private active = false;
@@ -20,9 +21,12 @@ export class VerticalSlider {
   private initialY;
   private xOffset = 0;
   private yOffset = 0;
-  private touchStartY = 0;
   private _debounce = false;
   // private touchStartMs = 0;
+  // private slider;
+  private debug: string;
+  // private count: number = 0;
+  protected touchStartY = 0;
   
 
   /**
@@ -83,8 +87,12 @@ export class VerticalSlider {
       return;
     }
 
-    const ratio = this.getRatio( value );
-    this.setTranslate(0, 100*ratio, this.dragItem);
+    // const ratio = this.getRatio( value );
+    let ratio = this.valueToPixels(value);
+    // if (ratio > this.dragItem.offsetHeight ) {
+    //   ratio = this.dragItem.offsetHeight;
+    // }
+    this.setTranslate(0, ratio, this.dragItem);
     console.log(`Value: ${value} | ${ratio}`);
 
     if (!this._debounce) {
@@ -136,19 +144,28 @@ export class VerticalSlider {
   // }
 
   async componentDidLoad() {
+    // this.slider = this.el.querySelector('.slide');
+    this.dragItem.style.height = '50%';
+
     this.initValue( this.value );
 
     this.el.addEventListener("touchstart", (e) => this.dragStart(e), false);
     this.el.addEventListener("touchend", (e) => this.dragEnd(e), false);
-    this.el.addEventListener("touchmove", (e) => this.drag(e), false);
+    // this.el.addEventListener("touchmove", (e) => this.drag(e), false);
 
     this.el.addEventListener("mousedown", (e) => this.dragStart(e), false);
     this.el.addEventListener("mouseup", (e) => this.dragEnd(e), false);
-    this.el.addEventListener("mousemove", (e) => this.drag(e), false);
+    // this.el.addEventListener("mousemove", (e) => this.drag(e), false);
 
+    this.dragItem.addEventListener("touchmove", (e) => this.drag(e), false);
+    this.dragItem.addEventListener("mousemove", (e) => this.drag(e), false);
+    this.dragItem.addEventListener("touchstart", (e) => this.dragStart(e), false);
+    this.dragItem.addEventListener("touchend", (e) => this.dragEnd(e));
+    this.dragItem.addEventListener("mouseup", (e) => this.dragEnd(e), false);
   }
 
   private dragStart(e) {
+    // e.preventDefault();
     let touchX
     let touchY;
 
@@ -164,6 +181,7 @@ export class VerticalSlider {
     // this.yOffset = this.currentY;
     this.yOffset =this.valueToPixels( this.value );
 
+
     this.initialX = touchX - this.xOffset;
     this.initialY = touchY - this.yOffset;
     this.touchStartY = touchY;
@@ -174,29 +192,34 @@ export class VerticalSlider {
   }
 
   private dragEnd(e) {
-    if (e.type === "mouseup") {
-      if ( Math.abs(e.clientY - this.touchStartY) < 2 ) {
-        this.currentY = e.offsetY;
-        this.yOffset = this.currentY;  
+    // e.preventDefault();
+    console.log("Event: ", e.type);
+    this.currentY = e.offsetY;
+    this.yOffset = this.currentY;  
 
-        if ( this.currentY ) {
-          this.value = this.pixelsToValue(this.currentY);
-        }  
-      }
-
-      this.initialX = this.currentX;
-      this.initialY = this.currentY;
-
+    if ( this.currentY < ( 0.5 * this.el.clientHeight ) ) {
+      this.currentY = 0;
+    } else if ( this.currentY > ( 0.5 * this.el.clientHeight ) ) {
+      this.currentY = this.dragItem.clientHeight;
     }
+
+    if ( this.currentY !== undefined ) {
+      this.value = this.pixelsToValue(this.currentY);
+    }  
+    
+    this.initialX = this.currentX;
+    this.initialY = this.currentY;
+
     this.active = false;
 
   }
 
+
   private drag(e) {
+    e.preventDefault();
 
     if (this.active) {
     
-      e.preventDefault();
       let touchX
       let touchY;
         
@@ -214,8 +237,9 @@ export class VerticalSlider {
       if ( this.currentY < 0 ) {
         this.currentY = 0;
         this.initialY = touchY;
-      } else if ( this.currentY > this.el.offsetHeight ) {
-        this.currentY = this.el.offsetHeight;
+      // } else if ( this.currentY > this.el.offsetHeight ) {
+      } else if ( this.currentY > this.dragItem.clientHeight ) {
+        this.currentY = this.dragItem.clientHeight;
         this.initialY = touchY - this.yOffset;
       }
 
@@ -228,22 +252,29 @@ export class VerticalSlider {
 
   setTranslate(xPos, yPos, el) {
     if ( el ) {
-      el.style.transform = "translate3d(" + xPos + "%, " + yPos + "%, 0)";
+      el.style.transform = "translate(" + xPos + "px, " + yPos + "px)";
     }
   }
 
+  private getText(): string {
+    return this.debug;
+  }
 
   render() {
     return (
         <Host>
         <div class="background">
           <div class="slide" ref={slide => this.dragItem = slide as HTMLElement}>
+            <ion-icon class="icon" name={`${this.icon}`}></ion-icon>
           </div>
         </div>
-        <ion-icon class="icon" name={`${this.icon}`}></ion-icon>
+        <div>{this.getText()}</div>
+        
         </Host>
     );
   }
+
+  
 
 
   valueToRatio(value: number, min: number, max: number): number {

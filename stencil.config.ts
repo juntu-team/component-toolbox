@@ -1,15 +1,12 @@
 import { Config } from '@stencil/core';
 
 export const config: Config = {
-  namespace: 'stencil-starter-project-name',
+  namespace: 'component-toolbox',
   globalStyle: 'src/global/variables.css',
   outputTargets: [
     {
       type: 'dist',
-      esmLoaderPath: '../loader',
-    },
-    {
-      type: 'dist-custom-elements-bundle',
+      // esmLoaderPath: '../loader',
     },
     {
       type: 'docs-readme',

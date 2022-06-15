@@ -8,12 +8,6 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { RangeChangeEventDetail } from "./components/vertical-slider/vertical-slider-interface";
 import { RangeChangeEventDetail as RangeChangeEventDetail1 } from "./components/vertical-switch/vertical-switch-interface";
 export namespace Components {
-    interface MySecondComponent {
-        "first": string;
-        "last": string;
-        "middle": string;
-        "value": number;
-    }
     interface VerticalSlider {
         /**
           * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
@@ -61,13 +55,15 @@ export namespace Components {
         "value": number;
     }
 }
+export interface VerticalSliderCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLVerticalSliderElement;
+}
+export interface VerticalSwitchCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLVerticalSwitchElement;
+}
 declare global {
-    interface HTMLMySecondComponentElement extends Components.MySecondComponent, HTMLStencilElement {
-    }
-    var HTMLMySecondComponentElement: {
-        prototype: HTMLMySecondComponentElement;
-        new (): HTMLMySecondComponentElement;
-    };
     interface HTMLVerticalSliderElement extends Components.VerticalSlider, HTMLStencilElement {
     }
     var HTMLVerticalSliderElement: {
@@ -81,18 +77,11 @@ declare global {
         new (): HTMLVerticalSwitchElement;
     };
     interface HTMLElementTagNameMap {
-        "my-second-component": HTMLMySecondComponentElement;
         "vertical-slider": HTMLVerticalSliderElement;
         "vertical-switch": HTMLVerticalSwitchElement;
     }
 }
 declare namespace LocalJSX {
-    interface MySecondComponent {
-        "first"?: string;
-        "last"?: string;
-        "middle"?: string;
-        "value"?: number;
-    }
     interface VerticalSlider {
         /**
           * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
@@ -114,7 +103,7 @@ declare namespace LocalJSX {
         /**
           * Emitted when the value property has changed.
          */
-        "onJunChange"?: (event: CustomEvent<RangeChangeEventDetail>) => void;
+        "onJunChange"?: (event: VerticalSliderCustomEvent<RangeChangeEventDetail>) => void;
         /**
           * Value
          */
@@ -141,14 +130,13 @@ declare namespace LocalJSX {
         /**
           * Emitted when the value property has changed.
          */
-        "onJunChange"?: (event: CustomEvent<RangeChangeEventDetail>) => void;
+        "onJunChange"?: (event: VerticalSwitchCustomEvent<RangeChangeEventDetail1>) => void;
         /**
           * Value
          */
         "value"?: number;
     }
     interface IntrinsicElements {
-        "my-second-component": MySecondComponent;
         "vertical-slider": VerticalSlider;
         "vertical-switch": VerticalSwitch;
     }
@@ -157,7 +145,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "my-second-component": LocalJSX.MySecondComponent & JSXBase.HTMLAttributes<HTMLMySecondComponentElement>;
             "vertical-slider": LocalJSX.VerticalSlider & JSXBase.HTMLAttributes<HTMLVerticalSliderElement>;
             "vertical-switch": LocalJSX.VerticalSwitch & JSXBase.HTMLAttributes<HTMLVerticalSwitchElement>;
         }
