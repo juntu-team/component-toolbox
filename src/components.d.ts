@@ -7,6 +7,8 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { RangeChangeEventDetail } from "./components/vertical-slider/vertical-slider-interface";
 import { RangeChangeEventDetail as RangeChangeEventDetail1 } from "./components/vertical-switch/vertical-switch-interface";
+export { RangeChangeEventDetail } from "./components/vertical-slider/vertical-slider-interface";
+export { RangeChangeEventDetail as RangeChangeEventDetail1 } from "./components/vertical-switch/vertical-switch-interface";
 export namespace Components {
     interface VerticalSlider {
         /**

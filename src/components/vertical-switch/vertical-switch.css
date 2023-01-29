@@ -9,7 +9,8 @@
 
 
 :host .background {
-  width: 120px;
+  width: 100px;
+  padding: 10px;
   height: 100%;
   overflow: hidden;
   border-radius: 30px;
@@ -18,12 +19,10 @@
 }
 
 :host .slide {
-  width: 100%;
-  /* height: 45%; */
+  height: 60%;
   background-color: var(--bar-slide);
-  border-radius: 30px;
+  border-radius: 20px;
   /* background-color: red; */
-  /* pointer-events: auto; */
 }
 
 :host .icon {

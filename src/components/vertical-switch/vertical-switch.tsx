@@ -93,7 +93,7 @@ export class VerticalSlider {
     //   ratio = this.dragItem.offsetHeight;
     // }
     this.setTranslate(0, ratio, this.dragItem);
-    console.log(`Value: ${value} | ${ratio}`);
+    // console.log(`Value: ${value} | ${ratio}`);
 
     if (!this._debounce) {
       // value = Math.trunc(value);
@@ -145,7 +145,7 @@ export class VerticalSlider {
 
   async componentDidLoad() {
     // this.slider = this.el.querySelector('.slide');
-    this.dragItem.style.height = '50%';
+    // this.dragItem.style.height = '50%';
 
     this.initValue( this.value );
 
@@ -157,15 +157,16 @@ export class VerticalSlider {
     this.el.addEventListener("mouseup", (e) => this.dragEnd(e), false);
     // this.el.addEventListener("mousemove", (e) => this.drag(e), false);
 
-    this.dragItem.addEventListener("touchmove", (e) => this.drag(e), false);
-    this.dragItem.addEventListener("mousemove", (e) => this.drag(e), false);
     this.dragItem.addEventListener("touchstart", (e) => this.dragStart(e), false);
-    this.dragItem.addEventListener("touchend", (e) => this.dragEnd(e));
+    this.dragItem.addEventListener("touchmove", (e) => this.drag(e), false);
+    this.dragItem.addEventListener("touchend", (e) => this.dragEnd(e), false);
+
+    this.dragItem.addEventListener("mousemove", (e) => this.drag(e), false);
     this.dragItem.addEventListener("mouseup", (e) => this.dragEnd(e), false);
   }
 
   private dragStart(e) {
-    // e.preventDefault();
+    e.preventDefault();
     let touchX
     let touchY;
 
@@ -177,10 +178,7 @@ export class VerticalSlider {
       touchY = e.clientY;
     }
 
-    // this.currentY =this.valueToPixels( this.value );
-    // this.yOffset = this.currentY;
     this.yOffset =this.valueToPixels( this.value );
-
 
     this.initialX = touchX - this.xOffset;
     this.initialY = touchY - this.yOffset;
@@ -192,15 +190,13 @@ export class VerticalSlider {
   }
 
   private dragEnd(e) {
-    // e.preventDefault();
-    console.log("Event: ", e.type);
-    this.currentY = e.offsetY;
-    this.yOffset = this.currentY;  
+    e.preventDefault();
 
-    if ( this.currentY < ( 0.5 * this.el.clientHeight ) ) {
-      this.currentY = 0;
-    } else if ( this.currentY > ( 0.5 * this.el.clientHeight ) ) {
-      this.currentY = this.dragItem.clientHeight;
+    let range = this.el.offsetHeight - this.dragItem.clientHeight;
+    if ( this.currentY < ( range / 2 ) ) {
+        this.currentY = 0;
+    } else if ( this.currentY > ( range / 2 ) ) {
+      this.currentY = this.el.offsetHeight - this.dragItem.clientHeight;
     }
 
     if ( this.currentY !== undefined ) {
@@ -236,13 +232,10 @@ export class VerticalSlider {
       
       if ( this.currentY < 0 ) {
         this.currentY = 0;
-        this.initialY = touchY;
-      // } else if ( this.currentY > this.el.offsetHeight ) {
-      } else if ( this.currentY > this.dragItem.clientHeight ) {
-        this.currentY = this.dragItem.clientHeight;
-        this.initialY = touchY - this.yOffset;
+      } else if ( this.currentY > ( this.el.offsetHeight - this.dragItem.clientHeight ) ) {
+        this.currentY = this.el.offsetHeight - this.dragItem.clientHeight;
       }
-
+  
       this.xOffset = this.currentX;
       this.yOffset = this.currentY;
 
@@ -252,6 +245,11 @@ export class VerticalSlider {
 
   setTranslate(xPos, yPos, el) {
     if ( el ) {
+      if ( yPos < 0 ) {
+        yPos = 0;
+      } else if ( yPos > ( this.el.offsetHeight - this.dragItem.clientHeight ) ) {
+        yPos = this.el.offsetHeight - this.dragItem.clientHeight;
+      }
       el.style.transform = "translate(" + xPos + "px, " + yPos + "px)";
     }
   }
