@@ -1,6 +1,7 @@
-import { Component, /* Listen, */ /* ComponentInterface, */ Element, Event, EventEmitter, Host, Prop, /* State, */ Watch, h } from '@stencil/core';
+import { Component, /* Listen, */ /* ComponentInterface, */ Element, Event, EventEmitter, Host, Prop, writeTask,/* State, */ Watch, h } from '@stencil/core';
 import { RangeChangeEventDetail/* , RangeValue */ } from './vertical-switch-interface';
-import { clamp, convertRange } from '../../utils/utils';
+// import { clamp, convertRange } from '../../utils/utils';
+import { Gesture, GestureConfig, createGesture } from '@ionic/core';
 import 'ionicons';
 
 @Component({
@@ -9,18 +10,12 @@ import 'ionicons';
   shadow: true
 })
 export class VerticalSlider {
-  @Element() el: HTMLElement;
+  @Element() hostElement: HTMLElement;
 
 
   // private background;
   private dragItem;
-  private active = false;
-  private currentX;
-  private currentY: number;
-  private initialX;
-  private initialY;
-  private xOffset = 0;
-  private yOffset = 0;
+
   private _debounce = false;
   // private touchStartMs = 0;
   // private slider;
@@ -87,13 +82,6 @@ export class VerticalSlider {
       return;
     }
 
-    // const ratio = this.getRatio( value );
-    let ratio = this.valueToPixels(value);
-    // if (ratio > this.dragItem.offsetHeight ) {
-    //   ratio = this.dragItem.offsetHeight;
-    // }
-    this.setTranslate(0, ratio, this.dragItem);
-    // console.log(`Value: ${value} | ${ratio}`);
 
     if (!this._debounce) {
       // value = Math.trunc(value);
@@ -106,153 +94,79 @@ export class VerticalSlider {
   }
 
 
-  protected getRatio(value: number): number {
-    return convertRange( value, [ this.max, this.min ], [ 0, 1 ] );
+
+
+  async connectedCallback() {
+    console.log("connectedCallback");
   }
 
-  protected valueToPixels(value: number): number {
-    return convertRange( value, [ this.max, this.min ], [ 0, this.el.clientHeight ] );
-  }
 
-  protected pixelsToValue(pixels: number): number {
-    return convertRange( pixels, [ this.el.clientHeight, 0 ], [ this.min, this.max ] );
-  }
-
-  protected initValue(value: number) {
-    // if (value < this.min ) { 
-    //   value = this.value = this.min; 
-    //   return;
-    // } else if (value > this.max ) { 
-    //   value = this.value = this.max; 
-    //   return;
-    // }
-
-    // const scaledVal = (this.max - this.min) - (value / (this.max - this.min) * 100);
-    // this.dragItem.style.transform = "translate3d(" + 0 + "px, " + scaledVal + "%, 0)";
-    // console.log(`Init value: ${this.min} | ${this.max} | ${value} | ${scaledVal}`);
-    this.valueChanged( value );
-    this.currentY =this.valueToPixels( value );
-    this.yOffset = this.currentY;
-  }
-
-  // connectedCallback() {
-  //   console.log("connectedCallback");
-  // }
-
-  // async componentWillLoad() {
+    // async componentWillLoad() {
   //   console.log("componentWillLoad");
   // }
 
   async componentDidLoad() {
-    // this.slider = this.el.querySelector('.slide');
-    // this.dragItem.style.height = '50%';
-
-    this.initValue( this.value );
-
-    this.el.addEventListener("touchstart", (e) => this.dragStart(e), false);
-    this.el.addEventListener("touchend", (e) => this.dragEnd(e), false);
+    this.hostElement.addEventListener("touchstart", (e) => { e.preventDefault() }, false);
+    // this.el.addEventListener("touchend", (e) => this.dragEnd(e), false);
     // this.el.addEventListener("touchmove", (e) => this.drag(e), false);
 
-    this.el.addEventListener("mousedown", (e) => this.dragStart(e), false);
-    this.el.addEventListener("mouseup", (e) => this.dragEnd(e), false);
+    this.hostElement.addEventListener("mousedown", (e) => { e.preventDefault() }, false);
+    // this.el.addEventListener("mousedown", (e) => this.dragStart(e), false);
+    // this.el.addEventListener("mouseup", (e) => this.dragEnd(e), false);
     // this.el.addEventListener("mousemove", (e) => this.drag(e), false);
 
-    this.dragItem.addEventListener("touchstart", (e) => this.dragStart(e), false);
-    this.dragItem.addEventListener("touchmove", (e) => this.drag(e), false);
-    this.dragItem.addEventListener("touchend", (e) => this.dragEnd(e), false);
-
-    this.dragItem.addEventListener("mousemove", (e) => this.drag(e), false);
-    this.dragItem.addEventListener("mouseup", (e) => this.dragEnd(e), false);
+    await this.initGesture();
   }
 
-  private dragStart(e) {
-    e.preventDefault();
-    let touchX
-    let touchY;
+  // if ( this.currentY < 0 ) {
+  //   this.currentY = 0;
+  // } else if ( this.currentY > ( this.el.offsetHeight - this.dragItem.clientHeight ) ) {
+  //   this.currentY = this.el.offsetHeight - this.dragItem.clientHeight;
+  // }
 
-    if (e.type === "touchstart") {
-      touchX = e.touches[0].clientX;
-      touchY = e.touches[0].clientY  
-    } else {
-      touchX = e.clientX;
-      touchY = e.clientY;
-    }
-
-    this.yOffset =this.valueToPixels( this.value );
-
-    this.initialX = touchX - this.xOffset;
-    this.initialY = touchY - this.yOffset;
-    this.touchStartY = touchY;
-
-    if (e.target === this.el || e.target === this.dragItem) {
-      this.active = true;
-    }
+  async initGesture() {
+    const style = this.dragItem.style;
+    const slideHeight = ( this.hostElement.offsetHeight - this.dragItem.clientHeight );
+    let actPos;
+    const options: GestureConfig = {
+      el: this.dragItem,
+      gestureName: 'sliderer',
+      gesturePriority: 100,
+      direction: 'y',
+      threshold: 5,
+      passive: false,
+      onStart: () => {
+        console.log('onStart');
+        style.transition = 'none';
+      },
+      onMove: (ev) => {
+        console.log('onMove');
+        let delta: number;
+        delta = actPos + ev.deltaY;
+        delta = ( delta < 0 ? 0 : (delta > slideHeight ? slideHeight : delta) );
+        style.transform = `translateY(${delta}px)`;
+      },
+      onEnd: (ev) => {
+        console.log('onEnd');
+        style.transition = '0.2s ease-out';
+        if (ev.deltaY > slideHeight / 2) {
+          style.transform = `translateY(${slideHeight}px)`;
+          actPos = slideHeight;
+          // this.match.emit(true);
+        } else if (ev.deltaY < slideHeight / 2) {
+          style.transform = `translateY(${0}px)`;
+          actPos = 0;
+          // this.match.emit(false);
+        } else {
+          style.transform = '';
+        }
+      },
+    };
+    const gesture: Gesture = await createGesture(options);
+    gesture.enable();
   }
 
-  private dragEnd(e) {
-    e.preventDefault();
-
-    let range = this.el.offsetHeight - this.dragItem.clientHeight;
-    if ( this.currentY < ( range / 2 ) ) {
-        this.currentY = 0;
-    } else if ( this.currentY > ( range / 2 ) ) {
-      this.currentY = this.el.offsetHeight - this.dragItem.clientHeight;
-    }
-
-    if ( this.currentY !== undefined ) {
-      this.value = this.pixelsToValue(this.currentY);
-    }  
-    
-    this.initialX = this.currentX;
-    this.initialY = this.currentY;
-
-    this.active = false;
-
-  }
-
-
-  private drag(e) {
-    e.preventDefault();
-
-    if (this.active) {
-    
-      let touchX
-      let touchY;
-        
-      if (e.type === "touchmove") {
-        touchX = e.touches[0].clientX;
-        touchY = e.touches[0].clientY;
-      } else {
-        touchX = e.clientX;
-        touchY = e.clientY;
-      }
-
-      this.currentX = touchX - this.initialX;
-      this.currentY = touchY - this.initialY;
-      
-      if ( this.currentY < 0 ) {
-        this.currentY = 0;
-      } else if ( this.currentY > ( this.el.offsetHeight - this.dragItem.clientHeight ) ) {
-        this.currentY = this.el.offsetHeight - this.dragItem.clientHeight;
-      }
   
-      this.xOffset = this.currentX;
-      this.yOffset = this.currentY;
-
-      this.value = this.pixelsToValue(this.currentY);
-    }
-  }
-
-  setTranslate(xPos, yPos, el) {
-    if ( el ) {
-      if ( yPos < 0 ) {
-        yPos = 0;
-      } else if ( yPos > ( this.el.offsetHeight - this.dragItem.clientHeight ) ) {
-        yPos = this.el.offsetHeight - this.dragItem.clientHeight;
-      }
-      el.style.transform = "translate(" + xPos + "px, " + yPos + "px)";
-    }
-  }
 
   private getText(): string {
     return this.debug;
@@ -260,22 +174,16 @@ export class VerticalSlider {
 
   render() {
     return (
-        <Host>
+      <Host>
         <div class="background">
           <div class="slide" ref={slide => this.dragItem = slide as HTMLElement}>
             <ion-icon class="icon" name={`${this.icon}`}></ion-icon>
           </div>
         </div>
-        <div>{this.getText()}</div>
-        
-        </Host>
+        <div>{this.getText()}</div>      
+      </Host>
     );
   }
 
   
-
-
-  valueToRatio(value: number, min: number, max: number): number {
-    return clamp(0, (value - min) / (max - min), 1);
-  };
 }
